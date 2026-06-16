@@ -1,0 +1,17 @@
+pyrogram
+pyromod==2.0.1
+tgcrypto
+cryptography
+pyjwt
+requests
+aiohttp
+aiofiles
+yt-dlp
+pytube
+m3u8
+beautifulsoup4
+cloudscraper
+ffmpeg-python
+setuptools
+gunicorn
+flask
