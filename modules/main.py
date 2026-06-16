@@ -8,6 +8,7 @@ import asyncio
 import requests
 import subprocess
 import random
+import aiohttp
 from pyromod import listen
 from pyrogram import Client, filters
 from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid
@@ -37,12 +38,25 @@ bot = Client(
     bot_token=BOT_TOKEN
 )
 
+# 🟢 एंटी-स्लीप सेल्फ पिंगर लूप (रेंडर वेब सर्विस को चालू रखने के लिए)
+async def keep_alive_loop():
+    await asyncio.sleep(30)  # बोट स्टार्ट होने के 30 सेकंड बाद पिंगर शुरू होगा
+    app_url = os.environ.get("RENDER_EXTERNAL_URL") or "https://your-app-name.onrender.com"
+    async with aiohttp.ClientSession() as session:
+        while True:
+            try:
+                async with session.get(app_url) as response:
+                    pass
+            except Exception:
+                pass
+            await asyncio.sleep(600)  # हर 10 मिनट में खुद को पिंग करेगा
+
 # .....,.....,.......,...,.......,....., .....,.....,.......,...,.......,.....,
 keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("✨ Commands", callback_data="cmd_command")],
             [InlineKeyboardButton("💎 Features", callback_data="feat_command"), InlineKeyboardButton("⚙️ Settings", callback_data="setttings")],
             [InlineKeyboardButton("💳 Plans", callback_data="upgrade_command")],
-            [InlineKeyboardButton(text="📞 Contact", url=f"tg://openmessage?user_id={OWNER}"), InlineKeyboardButton(text="🛠️ Repo", url="https://github.com/nikhilsainiop/saini-txt-direct")],
+            [InlineKeyboardButton(text="📞 Contact", url=f"tg://openmessage?user_id={OWNER}"), InlineKeyboardButton(text="🛠️ Repo", url="https://t.me/Avigat1210")],
         ])      
 
 @bot.on_message(filters.command("start"))
@@ -69,7 +83,7 @@ async def start(bot, m: Message):
         )
     await bot.send_photo(
         chat_id=m.chat.id,
-        photo="https://iili.io/KuCBoV2.jpg",
+        photo="https://files.catbox.moe/28epkq.jpg",
         caption=caption,
         reply_markup=keyboard
     )
@@ -83,7 +97,7 @@ async def back_to_main_menu(client, callback_query):
     
     await callback_query.message.edit_media(
       InputMediaPhoto(
-        media="https://envs.sh/GVI.jpg",
+        media="https://files.catbox.moe/tp3wk6.jpg",
         caption=caption
       ),
       reply_markup=keyboard
@@ -112,7 +126,7 @@ async def info(bot: Client, update: Message):
     text = (
         f"╭────────────────╮\n"
         f"│✨ **Your Telegram Info**✨ \n"
-        f"├────────────────\n"
+        f"├────────────────n"
         f"├🔹**Name :** `{update.from_user.first_name} {update.from_user.last_name if update.from_user.last_name else 'None'}`\n"
         f"├🔹**User ID :** @{update.from_user.username}\n"
         f"├🔹**TG ID :** `{update.from_user.id}`\n"
@@ -186,7 +200,7 @@ def notify_owner():
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     data = {
         "chat_id": OWNER,
-        "text": "𝐁𝐨𝐭 𝐑𝐞𝐬𝐭𝐚𝐫𝐭𝐞𝐝 𝐒𝐮𝐜𝐜𝐞𝐬𝐬𝐟𝐮𝐥𝐥𝐲 ✅"
+        "text": "𝐁𝐨𝐭 𝐑𝐞𝐬𝐭𝐚𝐫𝐭𝐞𝒅 𝐒𝐮𝐜𝐜𝐞𝐬𝐬𝐟𝐮𝐥𝐥𝐲 ✅"
     }
     requests.post(url, data=data)
 
@@ -230,8 +244,14 @@ def reset_and_set_commands():
         "language_code": "en"
     })
     
-if __name__ == "__main__":
+# बोट स्टार्ट होने और बैकग्राउंड में पिंगर लूप को साथ में रन करने के लिए
+async def start_services():
     reset_and_set_commands()
-    notify_owner() 
+    notify_owner()
+    asyncio.create_task(keep_alive_loop())
+    await bot.start()
+    await asyncio.Event().wait()
 
-bot.run()
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(start_services())
