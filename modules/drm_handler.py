@@ -221,8 +221,8 @@ async def drm_handler(bot: Client, m: Message):
         await m.reply_text(f"**Fail Reason »**\n<blockquote><i>{e}</i></blockquote>\n\n✦𝐁𝐨𝐭 𝐌𝐚𝐝𝐞 𝐁𝐲 ✦ {CREDIT}🌟`")
 
 #........................................................................................................................................................................................
-    failed_count = 0
-    count =int(raw_text)    
+        failed_count = 0
+    count = int(raw_text)    
     arg = int(raw_text)
     try:
         for i in range(arg-1, len(links)):
@@ -312,7 +312,6 @@ async def drm_handler(bot: Client, m: Message):
                 bcov = f'bcov_auth={cwtoken}'
                 url = url.split("bcov_auth")[0]+bcov
 
-            #elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
             elif "childId" in url and "parentId" in url:
                 url = f"https://anonymouspwplayer-0e5a3f512dec.herokuapp.com/pw?url={url}&token={pwtoken}"
                                       
@@ -365,7 +364,7 @@ async def drm_handler(bot: Client, m: Message):
                             cc = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} [{res}p] .mkv'
                             cc1 = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} .pdf'
                             cczip = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} .zip'
-                            ccimg = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} .jpg'
+                            ccimg = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></h1>\n<b>{str(count).zfill(3)}.</b> {v_name} .jpg'
                             ccm = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} .mp3'
                             cchtml = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} .html'
                     else:
@@ -396,7 +395,7 @@ async def drm_handler(bot: Client, m: Message):
                 Show = f"<i><b>Video Downloading</b></i>\n<blockquote><b>{str(count).zfill(3)}) {name1}</b></blockquote>" 
                 Show1 = f"<blockquote>🚀𝐏𝐫𝐨𝐠𝐫𝐞𝐬𝐬 » {progress:.2f}%</blockquote>\n┃\n" \
                         f"┣🔗𝐈𝐧𝐝𝐞𝐱 » {count}/{len(links)}\n┃\n" \
-                        f"╰━🖇️𝐑𝐞𝐦𝐚𝐢𝐧 » {remaining_links}\n" \
+                        f"╰━🖇️𝐑e𝐦𝐚𝐢𝐧 » {remaining_links}\n" \
                         f"━━━━━━━━━━━━━━━━━━━━━━━━\n" \
                         f"<blockquote><b>⚡Dᴏᴡɴʟᴏᴀᴅɪɴɢ Sᴛᴀʀᴛᴇᴅ...⏳</b></blockquote>\n┃\n" \
                         f'┣💃𝐂𝐫𝐞𝐝𝐢𝐭 » {CR}\n┃\n' \
@@ -418,15 +417,16 @@ async def drm_handler(bot: Client, m: Message):
                         os.remove(ka)
                     except FloodWait as e:
                         await m.reply_text(str(e))
-                        time.sleep(e.x)
+                        await asyncio.sleep(e.x)
+                        count += 1
                         continue    
   
                 elif "pdf" in url:
                     if "cwmediabkt99" in url:
-                        max_retries = 15  # Define the maximum number of retries
-                        retry_delay = 4  # Delay between retries in seconds
-                        success = False  # To track whether the download was successful
-                        failure_msgs = []  # To keep track of failure messages
+                        max_retries = 15  
+                        retry_delay = 4  
+                        success = False  
+                        failure_msgs = []  
                         
                         for attempt in range(max_retries):
                             try:
@@ -438,12 +438,12 @@ async def drm_handler(bot: Client, m: Message):
                                 if response.status_code == 200:
                                     with open(f'{namef}.pdf', 'wb') as file:
                                         file.write(response.content)
-                                    await asyncio.sleep(retry_delay)  # Optional, to prevent spamming
+                                    await asyncio.sleep(retry_delay)  
                                     copy = await bot.send_document(chat_id=channel_id, document=f'{namef}.pdf', caption=cc1)
                                     count += 1
                                     os.remove(f'{namef}.pdf')
                                     success = True
-                                    break  # Exit the retry loop if successful
+                                    break  
                                 else:
                                     failure_msg = await m.reply_text(f"Attempt {attempt + 1}/{max_retries} failed: {response.status_code} {response.reason}")
                                     failure_msgs.append(failure_msg)
@@ -454,47 +454,52 @@ async def drm_handler(bot: Client, m: Message):
                                 await asyncio.sleep(retry_delay)
                                 continue 
                         for msg in failure_msgs:
-                            await msg.delete()
+                            try:
+                                await msg.delete()
+                            except:
+                                pass
+                        if not success:
+                            raise Exception("CW Media PDF download failed after all attempts")
                             
                     else:
                         try:
-                            cmd = f'yt-dlp -o "{namef}.pdf" "{url}"'
-                            download_cmd = f"{cmd} -R 25 --fragment-retries 25"
-                            os.system(download_cmd)
+                            download_cmd = f'yt-dlp -o "{namef}.pdf" "{url}" -R 25 --fragment-retries 25'
+                            subprocess.run(download_cmd, shell=True, check=True)
                             copy = await bot.send_document(chat_id=channel_id, document=f'{namef}.pdf', caption=cc1)
                             count += 1
                             os.remove(f'{namef}.pdf')
                         except FloodWait as e:
                             await m.reply_text(str(e))
-                            time.sleep(e.x)
+                            await asyncio.sleep(e.x)
+                            count += 1
                             continue    
            
                 elif any(ext in url for ext in [".jpg", ".jpeg", ".png"]):
                     try:
                         ext = url.split('.')[-1]
-                        cmd = f'yt-dlp -o "{namef}.{ext}" "{url}"'
-                        download_cmd = f"{cmd} -R 25 --fragment-retries 25"
-                        os.system(download_cmd)
+                        download_cmd = f'yt-dlp -o "{namef}.{ext}" "{url}" -R 25 --fragment-retries 25'
+                        subprocess.run(download_cmd, shell=True, check=True)
                         copy = await bot.send_photo(chat_id=channel_id, photo=f'{namef}.{ext}', caption=ccimg)
                         count += 1
                         os.remove(f'{namef}.{ext}')
                     except FloodWait as e:
                         await m.reply_text(str(e))
-                        time.sleep(e.x)
+                        await asyncio.sleep(e.x)
+                        count += 1
                         continue    
 
                 elif any(ext in url for ext in [".mp3", ".wav", ".m4a"]):
                     try:
                         ext = url.split('.')[-1]
-                        cmd = f'yt-dlp -o "{namef}.{ext}" "{url}"'
-                        download_cmd = f"{cmd} -R 25 --fragment-retries 25"
-                        os.system(download_cmd)
+                        download_cmd = f'yt-dlp -o "{namef}.{ext}" "{url}" -R 25 --fragment-retries 25'
+                        subprocess.run(download_cmd, shell=True, check=True)
                         copy = await bot.send_document(chat_id=channel_id, document=f'{namef}.{ext}', caption=ccm)
                         count += 1
                         os.remove(f'{namef}.{ext}')
                     except FloodWait as e:
                         await m.reply_text(str(e))
-                        time.sleep(e.x)
+                        await asyncio.sleep(e.x)
+                        count += 1
                         continue    
                     
                 elif 'encrypted.m' in url:    
@@ -530,7 +535,7 @@ async def drm_handler(bot: Client, m: Message):
                     await prog.delete(True)
                     await helper.send_vid(bot, m, cc, filename, vidwatermark, thumb, name, prog, channel_id)
                     count += 1
-                    time.sleep(1)
+                    await asyncio.sleep(1)
                 
             except Exception as e:
                 await bot.send_message(channel_id, f'⚠️**Downloading Failed**⚠️\n**Name** =>> `{str(count).zfill(3)} {name1}`\n**Url** =>> {url}\n\n<blockquote expandable><i><b>Failed Reason: {str(e)}</b></i></blockquote>', disable_web_page_preview=True)
@@ -540,7 +545,7 @@ async def drm_handler(bot: Client, m: Message):
 
     except Exception as e:
         await m.reply_text(e)
-        time.sleep(2)
+        await asyncio.sleep(2)
 
     success_count = len(links) - failed_count
     video_count = v2_count + mpd_count + m3u8_count + yt_count + drm_count + zip_count + other_count
@@ -554,3 +559,5 @@ def register_drm_handlers(bot):
     @bot.on_message(filters.private & (filters.document | filters.text))
     async def call_drm_handler(bot: Client, m: Message):
         await drm_handler(bot, m)
+
+    
