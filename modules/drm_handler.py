@@ -221,7 +221,7 @@ async def drm_handler(bot: Client, m: Message):
         await m.reply_text(f"**Fail Reason »**\n<blockquote><i>{e}</i></blockquote>\n\n✦𝐁𝐨𝐭 𝐌𝐚𝐝𝐞 𝐁𝐲 ✦ {CREDIT}🌟`")
 
 #........................................................................................................................................................................................
-        failed_count = 0
+    failed_count = 0
     count = int(raw_text)    
     arg = int(raw_text)
     try:
@@ -364,7 +364,7 @@ async def drm_handler(bot: Client, m: Message):
                             cc = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} [{res}p] .mkv'
                             cc1 = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} .pdf'
                             cczip = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} .zip'
-                            ccimg = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></h1>\n<b>{str(count).zfill(3)}.</b> {v_name} .jpg'
+                            ccimg = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} .jpg'
                             ccm = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} .mp3'
                             cchtml = f'<blockquote><b>⋅ ─ {t_name} ─ ⋅</b></blockquote>\n<b>{str(count).zfill(3)}.</b> {v_name} .html'
                     else:
@@ -397,13 +397,13 @@ async def drm_handler(bot: Client, m: Message):
                         f"┣🔗𝐈𝐧𝐝𝐞𝐱 » {count}/{len(links)}\n┃\n" \
                         f"╰━🖇️𝐑e𝐦𝐚𝐢𝐧 » {remaining_links}\n" \
                         f"━━━━━━━━━━━━━━━━━━━━━━━━\n" \
-                        f"<blockquote><b>⚡Dᴏᴡɴʟᴏᴀᴅɪɴɢ Sᴛᴀʀᴛᴇᴅ...⏳</b></blockquote>\n┃\n" \
+                        f"<blockquote><b>⚡Dᴏᴡɴʟᴏᴀᴅɪɴɢ Sᴛᴀʀᴛᴇଡ...⏳</b></blockquote>\n┃\n" \
                         f'┣💃𝐂𝐫𝐞𝐝𝐢𝐭 » {CR}\n┃\n' \
                         f"╰━📚𝐁𝐚𝐭𝐜𝐡 » {b_name}\n" \
                         f"━━━━━━━━━━━━━━━━━━━━━━━━━\n" \
                         f"<blockquote>📚𝐓𝐢𝐭𝐥𝐞 » {namef}</blockquote>\n┃\n" \
                         f"┣🍁𝐐𝐮𝐚𝐥𝐢𝐭𝐲 » {quality}\n┃\n" \
-                        f'┣━🔗𝐋𝐢𝐧𝐤 » <a href="{link0}">**Original Link**</a>\n┃\n' \
+                        f'┣━🔗LNᴋ » <a href="{link0}">**Original Link**</a>\n┃\n' \
                         f'╰━━🖇️𝐔𝐫𝐥 » <a href="{url}">**Api Link**</a>\n' \
                         f"━━━━━━━━━━━━━━━━━━━━━━━━━\n" \
                         f"🛑**Send** /stop **to stop process**\n┃\n" \
@@ -548,6 +548,17 @@ async def drm_handler(bot: Client, m: Message):
         await asyncio.sleep(2)
 
     success_count = len(links) - failed_count
+    # Calculate file-specific summary safely
+    v2_count = globals.v2_count if hasattr(globals, 'v2_count') else 0
+    mpd_count = globals.mpd_count if hasattr(globals, 'mpd_count') else 0
+    m3u8_count = globals.m3u8_count if hasattr(globals, 'm3u8_count') else 0
+    yt_count = globals.yt_count if hasattr(globals, 'yt_count') else 0
+    drm_count = globals.drm_count if hasattr(globals, 'drm_count') else 0
+    zip_count = globals.zip_count if hasattr(globals, 'zip_count') else 0
+    other_count = globals.other_count if hasattr(globals, 'other_count') else 0
+    pdf_count = globals.pdf_count if hasattr(globals, 'pdf_count') else 0
+    img_count = globals.img_count if hasattr(globals, 'img_count') else 0
+    
     video_count = v2_count + mpd_count + m3u8_count + yt_count + drm_count + zip_count + other_count
     if m.document:
         await bot.send_message(channel_id, f"<b>-┈━═.•°✅ Completed ✅°•.═━┈-</b>\n<blockquote><b>🎯Batch Name : {b_name}</b></blockquote>\n<blockquote>🔗 Total URLs: {len(links)} \n┃   ┠🔴 Total Failed URLs: {failed_count}\n┃   ┠🟢 Total Successful URLs: {success_count}\n┃   ┃   ┠🎥 Total Video URLs: {video_count}\n┃   ┃   ┠📄 Total PDF URLs: {pdf_count}\n┃   ┃   ┠📸 Total IMAGE URLs: {img_count}</blockquote>\n")
@@ -559,5 +570,3 @@ def register_drm_handlers(bot):
     @bot.on_message(filters.private & (filters.document | filters.text))
     async def call_drm_handler(bot: Client, m: Message):
         await drm_handler(bot, m)
-
-    
