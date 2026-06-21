@@ -56,7 +56,7 @@ def register_settings_handlers(bot):
         ])
         await callback_query.message.edit_media(
         InputMediaPhoto(
-          media="https://tinypic.host/images/2025/07/14/file_00000000fc2461fbbdd6bc500cecbff8_conversation_id6874702c-9760-800e-b0bf-8e0bcf8a3833message_id964012ce-7ef5-4ad4-88e0-1c41ed240c03-1-1.jpg",
+          media="https://files.catbox.moe/8iqwzy.png",
           caption=caption
         ),
         reply_markup=keyboard
@@ -74,7 +74,7 @@ def register_settings_handlers(bot):
         ])
         await callback_query.message.edit_media(
         InputMediaPhoto(
-          media="https://tinypic.host/images/2025/07/14/file_00000000fc2461fbbdd6bc500cecbff8_conversation_id6874702c-9760-800e-b0bf-8e0bcf8a3833message_id964012ce-7ef5-4ad4-88e0-1c41ed240c03-1-1.jpg",
+          media="https://files.catbox.moe/8iqwzy.png",
           caption=caption
         ),
         reply_markup=keyboard
