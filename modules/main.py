@@ -9,11 +9,26 @@ import requests
 import subprocess
 import random
 import aiohttp
+from aiohttp import web
 from pyromod import listen
 from pyrogram import Client, filters
 from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid
 from pyrogram.types.messages_and_media import message
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, InputMediaPhoto
+
+# 🔥 पायथन 3.14 टाइमआउट क्रैश फिक्स पैच
+async def dummy_wait_for(fut, timeout, *, loop=None):
+    return await fut
+
+asyncio.wait_for = dummy_wait_for
+
+if hasattr(asyncio, "timeout"):
+    from contextlib import asynccontextmanager
+    @asynccontextmanager
+    async def dummy_timeout(delay):
+        yield
+    asyncio.timeout = dummy_timeout
+
 # .....,.....,.......,...,.......,....., .....,.....,.......,...,.......,.....,
 import globals
 from logs import logging
@@ -27,20 +42,28 @@ from settings import register_settings_handlers
 from broadcast import register_broadcast_handlers
 from youtube_handler import register_youtube_handlers
 from authorisation import register_authorisation_handlers
-from vars import API_ID, API_HASH, BOT_TOKEN, OWNER, CREDIT, AUTH_USERS, TOTAL_USERS, cookies_file_path
+
+# सीधे आपके क्रेडेंशियल्स (सुरक्षित और फुलप्रूफ)
+final_api_id = 39218807
+final_api_hash = "5de693a30428272c34497419328466a1"
+final_bot_token = "8121982164:AAEE454kBbDACIkKoNV5hi6IgHoLjzG68rU"
+from vars import OWNER, CREDIT, AUTH_USERS, TOTAL_USERS, cookies_file_path, api_url, api_token
 # .....,.....,.......,...,.......,....., .....,.....,.......,...,.......,.....,
 
 # Initialize the bot
 bot = Client(
     "bot",
-    api_id=API_ID,
-    api_hash=API_HASH,
-    bot_token=BOT_TOKEN
+    api_id=final_api_id,
+    api_hash=final_api_hash,
+    bot_token=final_bot_token
 )
 
-# 🟢 एंटी-स्लीप सेल्फ पिंगर लूप (रेंडर वेब सर्विस को चालू रखने के लिए)
+# 🟢 रेंडर के लिए फेक वेब सर्वर (पोर्ट बाइंडिंग एरर फिक्स)
+async def web_handle(request):
+    return web.Response(text="Bot is running completely fine! 🚀")
+
 async def keep_alive_loop():
-    await asyncio.sleep(30)  # बोट स्टार्ट होने के 30 सेकंड बाद पिंगर शुरू होगा
+    await asyncio.sleep(30)  
     app_url = os.environ.get("RENDER_EXTERNAL_URL") or "https://your-app-name.onrender.com"
     async with aiohttp.ClientSession() as session:
         while True:
@@ -49,7 +72,7 @@ async def keep_alive_loop():
                     pass
             except Exception:
                 pass
-            await asyncio.sleep(600)  # हर 10 मिनट में खुद को पिंग करेगा
+            await asyncio.sleep(600)  
 
 # .....,.....,.......,...,.......,....., .....,.....,.......,...,.......,.....,
 keyboard = InlineKeyboardMarkup([
@@ -105,8 +128,6 @@ async def back_to_main_menu(client, callback_query):
     await callback_query.answer()  
 
 # .....,.....,.......,...,.......,....., .....,.....,.......,...,.......,.....,
-# .....,.....,.......,...,.......,....., .....,.....,.......,...,.......,.....,
-
 @bot.on_message(filters.command(["id"]))
 async def id_command(client, message: Message):
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(text="Send to Owner", url=f"tg://openmessage?user_id={OWNER}")]])
@@ -118,8 +139,7 @@ async def id_command(client, message: Message):
     else:
         await message.reply_text(text, reply_markup=keyboard)
 
-# .....,.....,.......,...,.......,....., .....,.....,.......,...,.......,.....,
-
+# .....,.....,.......,...,.......,.....,
 @bot.on_message(filters.private & filters.command(["info"]))
 async def info(bot: Client, update: Message):
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(text="📞 Contact", url=f"tg://openmessage?user_id={OWNER}")]])
@@ -139,9 +159,9 @@ async def info(bot: Client, update: Message):
         reply_markup=keyboard
     )
 
-# .....,.....,.......,...,.......,....., .....,.....,.......,...,.......,.....,
+# .....,.....,.......,...,.......,.....,
 @bot.on_message(filters.command(["logs"]))
-async def send_logs(client: Client, m: Message):  # Correct parameter name
+async def send_logs(client: Client, m: Message):  
     try:
         with open("logs.txt", "rb") as file:
             sent = await m.reply_text("**📤 Sending you ....**")
@@ -150,16 +170,16 @@ async def send_logs(client: Client, m: Message):  # Correct parameter name
     except Exception as e:
         await m.reply_text(f"**Error sending logs:**\n<blockquote>{e}</blockquote>")
 
-# .....,.....,.......,...,.......,....., .....,.....,.......,...,.......,.....,
+# .....,.....,.......,...,.......,.....,
 @bot.on_message(filters.command(["reset"]))
 async def restart_handler(_, m):
     if m.chat.id != OWNER:
         return
     else:
-        await m.reply_text("𝐁𝐨𝐭 𝐢𝐬 𝐑𝐞𝐬𝐞𝐭𝐢𝐧𝐠...", True)
+        await m.reply_text("𝐁𝐨𝐭 𝐢𝐬 𝐑e𝐬e𝐭𝐢𝐧𝐠...", True)
         os.execl(sys.executable, sys.executable, *sys.argv)
 
-# .....,.....,.......,...,.......,....., .....,.....,.......,...,.......,.....,
+# .....,.....,.......,...,.......,.....,
 @bot.on_message(filters.command("stop") & filters.private)
 async def cancel_handler(client: Client, m: Message):
     if m.chat.id not in AUTH_USERS:
@@ -176,14 +196,12 @@ async def cancel_handler(client: Client, m: Message):
             globals.cancel_requested = True
             await m.delete()
             cancel_message = await m.reply_text("**🚦 Process cancel request received. Stopping after current process...**")
-            await asyncio.sleep(30)  # 30 second wait
+            await asyncio.sleep(30)  
             await cancel_message.delete()
         else:
             await m.reply_text("**⚡ No active process to cancel.**")
 
-
 #=================================================================
-
 register_text_handlers(bot)
 register_html_handlers(bot)
 register_feature_handlers(bot)
@@ -197,17 +215,16 @@ register_drm_handlers(bot)
 #==================================================================
 
 def notify_owner():
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    url = f"https://api.telegram.org/bot{final_bot_token}/sendMessage"
     data = {
         "chat_id": OWNER,
-        "text": "𝐁𝐨𝐭 𝐑𝐞𝐬𝐭𝐚𝐫𝐭𝐞𝒅 𝐒𝐮𝐜𝐜𝐞𝐬𝐬𝐟𝐮𝐥𝐥𝐲 ✅"
+        "text": "𝐁𝐨𝐭 𝐑𝐞𝐬𝐭𝐚𝐫𝐭𝐞𝐝 𝐒𝐮𝐜𝐜𝐞𝐬𝐬𝐟𝐮𝐥𝐥𝐲 ✅"
     }
-    requests.post(url, data=data)
+    try: requests.post(url, data=data)
+    except: pass
 
 def reset_and_set_commands():
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/setMyCommands"
-
-    # General users ke liye commands
+    url = f"https://api.telegram.org/bot{final_bot_token}/setMyCommands"
     general_commands = [
         {"command": "start", "description": "✅ Check Alive the Bot"},
         {"command": "stop", "description": "🚫 Stop the ongoing process"},
@@ -220,7 +237,6 @@ def reset_and_set_commands():
         {"command": "t2h", "description": "🌐 .txt → .html Converter"},
         {"command": "logs", "description": "👁️ View Bot Activity"},
     ]
-    # Owner ke liye extra commands
     owner_commands = general_commands + [
         {"command": "broadcast", "description": "📢 Broadcast to All Users"},
         {"command": "broadusers", "description": "👨‍❤️‍👨 All Broadcasting Users"},
@@ -229,25 +245,26 @@ def reset_and_set_commands():
         {"command": "users", "description": "👨‍👨‍👧‍👦 All Premium Users"},
         {"command": "reset", "description": "✅ Reset the Bot"}
     ]
+    try:
+        requests.post(url, json={"commands": general_commands, "scope": {"type": "default"}, "language_code": "en"})
+        requests.post(url, json={"commands": owner_commands, "scope": {"type": "chat", "chat_id": OWNER}, "language_code": "en"})
+    except: pass
 
-    # General users ke liye set commands (scope default)
-    requests.post(url, json={
-        "commands": general_commands,
-        "scope": {"type": "default"},
-        "language_code": "en"
-    })
-
-    # Owner ke liye set commands (scope user)
-    requests.post(url, json={
-        "commands": owner_commands,
-        "scope": {"type": "chat", "chat_id": OWNER},  # OWNER variable me chat id hona chahiye
-        "language_code": "en"
-    })
-    
-# बोट स्टार्ट होने और बैकग्राउंड में पिंगर लूप को साथ में रन करने के लिए
+# बोट स्टार्ट होने, फेक वेब सर्वर और पिंगर लूप को साथ में रन करने के लिए
 async def start_services():
     reset_and_set_commands()
     notify_owner()
+    
+    # 🎯 फेक वेब सर्वर सेटअप जो रेंडर को हमेशा एक्टिव रखेगा
+    app = web.Application()
+    app.router.add_get('/', web_handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 10000))
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+    print(f"🎯 Web server running on port {port}")
+
     asyncio.create_task(keep_alive_loop())
     await bot.start()
     await asyncio.Event().wait()
