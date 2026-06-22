@@ -43,12 +43,23 @@ from broadcast import register_broadcast_handlers
 from youtube_handler import register_youtube_handlers
 from authorisation import register_authorisation_handlers
 
-# सीधे आपके क्रेडेंशियल्स (सुरक्षित और फुलप्रूफ)
-final_api_id = 39218807
-final_api_hash = "5de693a30428272c34497419328466a1"
-final_bot_token = "8121982164:AAEE454kBbDACIkKoNV5hi6IgHoLjzG68rU"
 from vars import OWNER, CREDIT, AUTH_USERS, TOTAL_USERS, cookies_file_path, api_url, api_token
 # .....,.....,.......,...,.......,....., .....,.....,.......,...,.......,.....,
+
+# 🔐 क्रेडेंशियल्स सेटअप (API_ID और API_HASH एनवायरनमेंट से उठेंगे)
+api_id_env = os.environ.get("API_ID") or os.environ.get("api_id")
+api_hash_env = os.environ.get("API_HASH") or os.environ.get("api_hash")
+
+# आपका बिल्कुल सही नया बोट टोकन ✅
+final_bot_token = "8637211783:AAHU6oX6-Dx9s03iMaeEuNv8PJgDmMGOmfg"
+
+# API_ID को सुरक्षित रूप से नंबर (Integer) में बदलना
+try:
+    final_api_id = int(api_id_env.strip()) if api_id_env else None
+except Exception:
+    final_api_id = None
+
+final_api_hash = api_hash_env.strip() if api_hash_env else None
 
 # Initialize the bot
 bot = Client(
@@ -218,7 +229,7 @@ def notify_owner():
     url = f"https://api.telegram.org/bot{final_bot_token}/sendMessage"
     data = {
         "chat_id": OWNER,
-        "text": "𝐁𝐨𝐭 𝐑𝐞𝐬𝐭𝐚𝐫𝐭𝐞𝐝 𝐒𝐮𝐜𝐜𝐞𝐬𝐬𝐟𝐮𝐥𝐥𝐲 ✅"
+        "text": "𝐁𝐨𝐭 𝐑e𝐬𝐭𝐚𝐫𝐭e𝐝 𝐒𝐮𝐜𝐜𝐞𝐬𝐬𝐟𝐮𝐥𝐥𝐲 ✅"
     }
     try: requests.post(url, data=data)
     except: pass
